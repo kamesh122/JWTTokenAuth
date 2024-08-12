@@ -1,6 +1,6 @@
 GO 
 
-IF DB_ID('AraModel') IS NULL
+IF DB_ID('JWTAuthentication') IS NULL
  BEGIN
  CREATE DATABASE JWTAuthentication
  END
