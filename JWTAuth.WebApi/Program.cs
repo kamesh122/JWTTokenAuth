@@ -1,6 +1,8 @@
 using JWTAuth.WebApi.Interface;
+using JWTAuth.WebApi.Middleware;
 using JWTAuth.WebApi.Models;
 using JWTAuth.WebApi.Repository;
+using JWTAuth.WebApi.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -14,6 +16,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<DatabaseContext>
     (options => options.UseSqlServer(builder.Configuration.GetConnectionString("dbConnection")));
 builder.Services.AddTransient<IEmployees, EmployeeRepository>();
+builder.Services.AddScoped<IIdempotencyService, IdempotencyService>();
+//builder.Services.AddScoped<IdempotencyMiddleware>();
 builder.Services.AddControllers();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
@@ -46,6 +50,8 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 
 app.UseAuthorization();
+// Add custom middleware to the pipeline
+app.UseMiddleware<IdempotencyMiddleware>();
 
 app.MapControllers();
 

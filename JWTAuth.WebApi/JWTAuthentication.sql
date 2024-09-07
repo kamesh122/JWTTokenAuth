@@ -53,3 +53,12 @@ INSERT [dbo].[Employee] VALUES (2, N'245797967', N'Raeann Santos', N'adventure-w
 INSERT [dbo].[Employee] VALUES (3, N'509647174', N'Pamela Wambsgans', N'adventure-works\roberto0', N'Engineering Manager', CAST(N'1974-11-12' AS Date), N'M', N'M', CAST(N'2007-11-11' AS Date), 2, 21, N'9bbbfb2c-efbb-4217-9ab7-f97689328841', CAST(N'2014-06-30 00:00:00.000' AS DateTime))
 END
 GO
+
+
+CREATE TABLE IdempotencyKeys (
+    IdempotencyKey NVARCHAR(50) PRIMARY KEY,
+    RequestBody NVARCHAR(MAX),
+    ResponseBody NVARCHAR(MAX),
+    StatusCode INT,
+    Timestamp DATETIME
+)

@@ -15,7 +15,9 @@ namespace JWTAuth.WebApi.Models
 
         public virtual DbSet<Employee>? Employees { get; set; }
         public virtual DbSet<UserInfo>? UserInfos { get; set; }
+        public virtual DbSet<IdempotencyKeysTable>? IdempotencyKeys { get; set; }
 
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UserInfo>(entity =>
@@ -94,6 +96,33 @@ namespace JWTAuth.WebApi.Models
 
                 entity.Property(e => e.ModifiedDate)
                       .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<IdempotencyKeysTable>(entity =>
+            {
+
+                entity.HasKey(e => e.IdempotencyKey);
+
+                entity.ToTable("IdempotencyKeys");
+
+                entity.Property(e => e.IdempotencyKey).HasColumnName("IdempotencyKey");
+
+                entity.Property(e => e.RequestBody)
+                    .HasMaxLength(4000)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.StatusCode)
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ResponseBody)
+                    .HasMaxLength(8000)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Timestamp)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+                 
             });
 
             OnModelCreatingPartial(modelBuilder);
