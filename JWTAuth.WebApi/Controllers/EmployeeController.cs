@@ -1,4 +1,6 @@
-﻿using JWTAuth.WebApi.Interface;
+﻿using AutoMapper;
+using JWTAuth.WebApi.DTOs;
+using JWTAuth.WebApi.Interface;
 using JWTAuth.WebApi.Models;
 using JWTAuth.WebApi.Service;
 using Microsoft.AspNetCore.Authorization;
@@ -15,28 +17,33 @@ namespace JWTAuth.WebApi.Controllers
     {
         private readonly IEmployees _IEmployee;
         private readonly IIdempotencyService _idempotencyService;
-        public EmployeeController(IEmployees IEmployee, IIdempotencyService idempotencyService)
+        private readonly IMapper _mapper;
+        public EmployeeController(IEmployees IEmployee, IIdempotencyService idempotencyService, IMapper mapper)
         {
             _IEmployee = IEmployee;
             _idempotencyService = idempotencyService;
+            _mapper = mapper;
         }
 
         // GET: api/employee>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Employee>>> Get()
+        public async Task<ActionResult<IEnumerable<EmployeeDTO>>> Get()
         {
             string idempotencyKey = Request.Headers["Idempotency-Key"];
 
 
             // Process your logic here
             var result = _IEmployee.GetEmployeeDetails();
-
+            IEnumerable<EmployeeDTO> enumerable = result.Select(emp => _mapper.Map<EmployeeDTO>(emp));
+            
             // Store the response
-            string responseBody = JsonConvert.SerializeObject(result);
+            string responseBody = JsonConvert.SerializeObject(enumerable);
             await _idempotencyService.StoreResponseForKeyAsync(idempotencyKey, "Get Empolyee", responseBody, 200);
 
-            return await Task.FromResult(result);
+            return await Task.FromResult(enumerable.ToList());
         }
+
+        
 
         // GET api/employee/5
         [HttpGet("{id}")]
